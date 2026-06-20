@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil de franquiciatario | Dr. Miguel Ávila</title>
+<meta name="description" content="Descubre si tu perfil es compatible con la operación de una franquicia: cumplimiento de sistema vs. necesidad de autoría.">
+<style>
+  @font-face {
+    font-family: 'Source Serif';
+    src: local('Georgia');
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #000000;
+    color: #f2f0f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px 64px;
+  }
+  .logo {
+    width: 40px;
+    height: auto;
+    margin-bottom: 40px;
+    opacity: 0.92;
+  }
+  .container {
+    width: 100%;
+    max-width: 640px;
+  }
+  button {
+    font-family: inherit;
+  }
+  ::selection { background: #572c80; color: #fff; }
+  a { color: #9b6fc4; }
+
+  .q-progress-wrap { margin-bottom: 40px; }
+  .q-progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #8a8694; margin-bottom: 8px;
+  }
+  .q-track { height: 1px; background: #3a3640; width: 100%; }
+  .q-fill { height: 1px; background: #9b6fc4; transition: width .35s ease; }
+
+  .q-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px; line-height: 1.45; font-weight: 400;
+    margin: 0 0 36px; color: #f2f0f5;
+  }
+
+  .opt-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+  .opt-btn {
+    text-align: left; display: flex; align-items: center; gap: 14px;
+    padding: 13px 16px; border-radius: 6px; border: 0.5px solid #3a3640;
+    background: transparent; cursor: pointer; font-size: 14px; color: #f2f0f5;
+    transition: border-color .15s, background .15s;
+  }
+  .opt-btn:hover { border-color: #572c80; background: rgba(87,44,128,0.12); }
+  .opt-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    border: 1px solid #8a8694; flex-shrink: 0;
+  }
+  .opt-label { text-transform: capitalize; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; }
+  .back-btn {
+    font-size: 13px; color: #8a8694; background: none; border: none;
+    cursor: pointer; padding: 6px 0;
+  }
+
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #9b6fc4; margin: 0 0 8px;
+  }
+  .result-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px; line-height: 1.3; font-weight: 400;
+    margin: 0 0 28px; color: #f2f0f5;
+  }
+
+  .matrix-outer { margin-bottom: 28px; }
+  .matrix-box {
+    position: relative; width: 100%; aspect-ratio: 1 / 0.78;
+    border: 0.5px solid #3a3640; border-radius: 6px;
+  }
+  .matrix-mid-v { position: absolute; left: 50%; top: 0; bottom: 0; width: 0.5px; background: #3a3640; }
+  .matrix-mid-h { position: absolute; top: 50%; left: 0; right: 0; height: 0.5px; background: #3a3640; }
+  .matrix-axis-label {
+    position: absolute; font-size: 10px; letter-spacing: 0.05em;
+    text-transform: uppercase; color: #8a8694; white-space: nowrap;
+  }
+  .matrix-point {
+    position: absolute; width: 12px; height: 12px; border-radius: 50%;
+    background: #9b6fc4; transform: translate(-50%,-50%);
+  }
+  .matrix-ring {
+    position: absolute; width: 28px; height: 28px; border-radius: 50%;
+    border: 0.5px solid #572c80; transform: translate(-50%,-50%);
+  }
+
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+  .metric-card {
+    background: rgba(87,44,128,0.14); border-radius: 6px; padding: 16px;
+  }
+  .metric-label { font-size: 13px; color: #8a8694; margin: 0 0 4px; }
+  .metric-value { font-size: 24px; font-weight: 500; margin: 0; color: #f2f0f5; }
+
+  .desc-p { font-size: 15px; line-height: 1.7; color: #bdb8c6; margin: 0 0 32px; }
+  .divider { height: 0.5px; background: #3a3640; margin: 0 0 32px; }
+
+  .close-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 19px; font-weight: 400; margin: 0 0 16px; color: #f2f0f5;
+  }
+  .close-body { font-size: 14px; line-height: 1.75; color: #bdb8c6; margin: 0 0 28px; }
+
+  .cta-primary {
+    display: block; width: 100%; text-align: center; padding: 14px;
+    border-radius: 6px; border: 0.5px solid #572c80; background: #572c80;
+    color: #f2f0f5; font-size: 14px; font-weight: 500; cursor: pointer;
+    text-decoration: none; margin-bottom: 12px;
+  }
+  .cta-primary:hover { background: #6b3a9e; }
+
+  .cta-whatsapp {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; text-align: center; padding: 13px;
+    border-radius: 6px; border: 0.5px solid #3a3640; background: transparent;
+    color: #f2f0f5; font-size: 14px; font-weight: 500; cursor: pointer;
+    text-decoration: none; margin-bottom: 24px;
+  }
+  .cta-whatsapp:hover { border-color: #25D366; color: #25D366; }
+
+  .share-row {
+    display: flex; align-items: center; gap: 8px; padding: 12px 14px;
+    border-radius: 6px; background: #140a1d; margin-bottom: 24px;
+  }
+  .share-text {
+    font-size: 12px; color: #8a8694; flex: 1; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .copy-btn {
+    display: flex; align-items: center; gap: 6px; font-size: 12px;
+    padding: 7px 12px; border-radius: 6px; border: 0.5px solid #3a3640;
+    background: transparent; cursor: pointer; color: #f2f0f5; flex-shrink: 0;
+  }
+  .copy-btn:hover { border-color: #572c80; }
+
+  .restart-btn {
+    display: block; margin: 0 auto; font-size: 12px; color: #8a8694;
+    background: none; border: none; cursor: pointer;
+  }
+  .site-link {
+    display: block; text-align: center; margin-top: 12px; font-size: 12px;
+    color: #8a8694; text-decoration: none;
+  }
+  .site-link:hover { color: #9b6fc4; }
+</style>
+</head>
+<body>
+<div class="page">
+  <img class="logo" alt="Dr. Miguel Ávila" src="data:image/jpeg;base64,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">
+  <div class="container" id="app"></div>
+</div>
+
+<script>
+(function(){
+
+var QUESTIONS = [
+  { axis: 'sistema', text: 'Cuando un manual de operaciones me dice exactamente cómo hacer algo, lo sigo aunque se me ocurra una forma distinta.' },
+  { axis: 'autoria', text: 'Necesito que un negocio lleve mi sello personal para sentirlo realmente mío.' },
+  { axis: 'sistema', text: 'Prefiero la consistencia de un proceso probado sobre la libertad de experimentar.' },
+  { axis: 'autoria', text: 'Cuando algo no me convence del todo, tiendo a modificarlo aunque no sea mi decisión cambiarlo.' },
+  { axis: 'sistema', text: 'Puedo repetir la misma rutina, todos los días, sin que eso me desgaste.' },
+  { axis: 'autoria', text: 'Mi mayor satisfacción profesional viene de crear algo nuevo, no de operar algo que ya existe.' },
+  { axis: 'sistema', text: 'Sigo instrucciones detalladas con disciplina, incluso cuando nadie está supervisando.' },
+  { axis: 'autoria', text: 'Me cuesta aceptar una regla si no entiendo o no comparto la razón detrás de ella.' },
+  { axis: 'sistema', text: 'Confío más en un sistema que ya funciona en otros lugares que en mi propio criterio improvisado.' },
+  { axis: 'autoria', text: 'Si una marca me limita en cómo comunicar o vender, lo vivo como una frustración constante.' },
+  { axis: 'sistema', text: 'Las auditorías o supervisiones de cumplimiento no me generan resistencia, las veo como parte normal del trabajo.' },
+  { axis: 'autoria', text: 'Disfruto más diseñar algo desde cero que perfeccionar algo que alguien más diseñó.' },
+  { axis: 'sistema', text: 'Cuando un proceso cambia desde la central, lo adopto sin necesidad de cuestionarlo primero.' },
+  { axis: 'autoria', text: 'Me identifico como alguien inquieto, que necesita variedad y novedad para mantenerse motivado.' },
+  { axis: 'sistema', text: 'Prefiero que me digan exactamente qué hacer a tener que decidir el cómo desde cero.' },
+  { axis: 'autoria', text: 'Si veo una oportunidad de mejora, actúo primero y pido permiso después.' }
+];
+
+var SCALE = [
+  {v:1, label:'totalmente en desacuerdo'},
+  {v:2, label:'en desacuerdo'},
+  {v:3, label:'neutral'},
+  {v:4, label:'de acuerdo'},
+  {v:5, label:'totalmente de acuerdo'}
+];
+
+var PROFILES = {
+  ideal: {
+    name: 'Ejecutor fiel',
+    desc: 'Tu perfil muestra alta disciplina de sistema y baja necesidad de autoría. Es el perfil que mejor se adapta a la lógica estructural de una franquicia: replicar con consistencia un modelo que ya funciona, sin necesidad de dejar tu huella creativa en el proceso.'
+  },
+  canalizable: {
+    name: 'Disciplinado con inquietud creativa',
+    desc: 'Sigues sistemas con disciplina, pero también necesitas espacio para crear. Puedes operar bien una franquicia si encuentras dónde canalizar esa necesidad de autoría fuera de la unidad operativa, por ejemplo en comités de innovación o en un segundo proyecto propio.'
+  },
+  riesgo: {
+    name: 'Posible negligencia operativa',
+    desc: 'Tu perfil muestra baja disciplina de sistema y baja necesidad de autoría. No es un perfil rebelde, sino uno que puede desatender procesos sin proponérselo. Antes de invertir, vale la pena fortalecer hábitos de seguimiento y supervisión externa.'
+  },
+  emprendedor: {
+    name: 'Emprendedor, no franquiciatario',
+    desc: 'Tu perfil muestra baja disciplina de sistema y alta necesidad de autoría. Es probable que la lógica de franquicia, replicar fielmente un modelo ajeno, te resulte frustrante con el tiempo. Tu energía natural parece estar mejor dirigida hacia construir algo propio desde cero.'
+  }
+};
+
+var state = { idx: 0, answers: new Array(QUESTIONS.length).fill(null), done: false };
+
+function el(html){ var d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
+
+function quadrantKey(sis, aut){
+  var highSis = sis >= 50;
+  var highAut = aut >= 50;
+  if(highSis && !highAut) return 'ideal';
+  if(highSis && highAut) return 'canalizable';
+  if(!highSis && !highAut) return 'riesgo';
+  return 'emprendedor';
+}
+
+function render(){
+  var app = document.getElementById('app');
+  app.innerHTML = '';
+  if(!state.done){
+    app.appendChild(renderQuestion());
+  } else {
+    app.appendChild(renderResult());
+  }
+}
+
+function renderQuestion(){
+  var q = QUESTIONS[state.idx];
+  var pct = Math.round((state.idx)/QUESTIONS.length*100);
+  var wrap = el('<div></div>');
+
+  var progWrap = el('<div class="q-progress-wrap"></div>');
+  var progLabel = el('<div class="q-progress-label"><span>Pregunta '+(state.idx+1)+' de '+QUESTIONS.length+'</span><span>'+pct+'%</span></div>');
+  var track = el('<div class="q-track"></div>');
+  var fill = el('<div class="q-fill" style="width:'+pct+'%;"></div>');
+  track.appendChild(fill);
+  progWrap.appendChild(progLabel);
+  progWrap.appendChild(track);
+  wrap.appendChild(progWrap);
+
+  var qText = el('<p class="q-text"></p>');
+  qText.textContent = q.text;
+  wrap.appendChild(qText);
+
+  var opts = el('<div class="opt-list"></div>');
+  SCALE.forEach(function(s){
+    var btn = el('<button type="button" class="opt-btn"><span class="opt-dot"></span><span class="opt-label"></span></button>');
+    btn.querySelector('.opt-label').textContent = s.label;
+    btn.addEventListener('click', function(){
+      state.answers[state.idx] = {axis:q.axis, v:s.v};
+      if(state.idx < QUESTIONS.length-1){ state.idx++; render(); window.scrollTo(0,0); }
+      else { state.done = true; render(); window.scrollTo(0,0); }
+    });
+    opts.appendChild(btn);
+  });
+  wrap.appendChild(opts);
+
+  var nav = el('<div class="nav-row"></div>');
+  var back = el('<button type="button" class="back-btn">← anterior</button>');
+  back.style.visibility = state.idx === 0 ? 'hidden' : 'visible';
+  back.addEventListener('click', function(){ if(state.idx>0){ state.idx--; render(); window.scrollTo(0,0); } });
+  nav.appendChild(back);
+  wrap.appendChild(nav);
+
+  return wrap;
+}
+
+function computeProfile(answers){
+  var sis = answers.filter(function(a){return a.axis==='sistema';});
+  var aut = answers.filter(function(a){return a.axis==='autoria';});
+  var sisScore = sis.reduce(function(s,a){return s+a.v;},0) / (sis.length*5) * 100;
+  var autScore = aut.reduce(function(s,a){return s+a.v;},0) / (aut.length*5) * 100;
+  return { sistema: Math.round(sisScore), autoria: Math.round(autScore) };
+}
+
+function buildShareUrl(p){
+  var base = window.location.origin + window.location.pathname;
+  return base + '?s=' + p.sistema + '&a=' + p.autoria;
+}
+
+function readSharedResult(){
+  var params = new URLSearchParams(window.location.search);
+  if(params.has('s') && params.has('a')){
+    var sis = parseInt(params.get('s'), 10);
+    var aut = parseInt(params.get('a'), 10);
+    if(!isNaN(sis) && !isNaN(aut) && sis>=0 && sis<=100 && aut>=0 && aut<=100){
+      return { sistema: sis, autoria: aut };
+    }
+  }
+  return null;
+}
+
+function renderResult(){
+  var p = computeProfile(state.answers);
+  var key = quadrantKey(p.sistema, p.autoria);
+  var prof = PROFILES[key];
+  return buildResultDOM(p, prof, true);
+}
+
+function buildResultDOM(p, prof, allowRestart){
+  var wrap = el('<div></div>');
+
+  wrap.appendChild(el('<p class="eyebrow">Resultado del perfil</p>'));
+
+  var title = el('<p class="result-title"></p>');
+  title.textContent = prof.name;
+  wrap.appendChild(title);
+
+  var matrixOuter = el('<div class="matrix-outer"></div>');
+  var matrixBox = el('<div class="matrix-box"></div>');
+  matrixBox.appendChild(el('<div class="matrix-mid-v"></div>'));
+  matrixBox.appendChild(el('<div class="matrix-mid-h"></div>'));
+
+  var labels = [
+    {text:'alta autoría', style:'top:8px; left:50%; transform:translateX(-50%);'},
+    {text:'baja autoría', style:'bottom:8px; left:50%; transform:translateX(-50%);'},
+    {text:'bajo cumplimiento', style:'top:50%; left:8px; transform:translateY(-50%) rotate(-90deg); transform-origin:left center;'},
+    {text:'alto cumplimiento', style:'top:50%; right:8px; transform:translateY(-50%) rotate(90deg); transform-origin:right center;'}
+  ];
+  labels.forEach(function(l){
+    var L = el('<span class="matrix-axis-label"></span>');
+    L.setAttribute('style', L.getAttribute('style') + l.style);
+    L.textContent = l.text;
+    matrixBox.appendChild(L);
+  });
+
+  var px = 6 + (p.sistema/100)*88;
+  var py = 94 - (p.autoria/100)*88;
+  var point = el('<div class="matrix-point"></div>');
+  point.style.left = px + '%'; point.style.top = py + '%';
+  matrixBox.appendChild(point);
+  var ring = el('<div class="matrix-ring"></div>');
+  ring.style.left = px + '%'; ring.style.top = py + '%';
+  matrixBox.appendChild(ring);
+
+  matrixOuter.appendChild(matrixBox);
+  wrap.appendChild(matrixOuter);
+
+  var metrics = el('<div class="metrics-grid"></div>');
+  var m1 = el('<div class="metric-card"><p class="metric-label">Cumplimiento de sistema</p><p class="metric-value"></p></div>');
+  m1.querySelector('.metric-value').textContent = p.sistema;
+  var m2 = el('<div class="metric-card"><p class="metric-label">Necesidad de autoría</p><p class="metric-value"></p></div>');
+  m2.querySelector('.metric-value').textContent = p.autoria;
+  metrics.appendChild(m1); metrics.appendChild(m2);
+  wrap.appendChild(metrics);
+
+  var descP = el('<p class="desc-p"></p>');
+  descP.textContent = prof.desc;
+  wrap.appendChild(descP);
+
+  wrap.appendChild(el('<div class="divider"></div>'));
+
+  wrap.appendChild(el('<p class="eyebrow">Antes de decidir, una aclaración</p>'));
+  wrap.appendChild(el('<p class="close-title">Qué es una franquicia, desde el lugar del franquiciatario</p>'));
+  wrap.appendChild(el('<p class="close-body">No es una sociedad ni una inversión pasiva: no hay propiedad compartida del negocio ni dividendos que lleguen sin operar. No es un empleo: nadie te paga un sueldo y la responsabilidad del resultado es tuya. Y no es un espacio para reinventar el modelo: es la licencia para ejecutar, con disciplina y consistencia, un sistema que ya fue probado por alguien más. Lo que compra el franquiciatario no es libertad creativa, es una probabilidad de éxito más alta a cambio de seguir reglas que no diseñó.</p>'));
+
+  var ctaPrimary = el('<a class="cta-primary" target="_blank" rel="noopener">Agendar una conversación sobre mi resultado ↗</a>');
+  ctaPrimary.href = 'https://www.yafahexpress.com/registro-franquicias';
+  wrap.appendChild(ctaPrimary);
+
+  var waMsg = 'Hola, hice el test de perfil de franquiciatario y mi resultado fue "' + prof.name + '" (cumplimiento de sistema ' + p.sistema + ', necesidad de autoría ' + p.autoria + '). Quisiera platicar sobre oportunidades de franquicia.';
+  var waBtn = el('<a class="cta-whatsapp" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.04 21.785h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0 0 12.04 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.674 1.447h.005c6.545 0 11.879-5.335 11.882-11.893a11.821 11.821 0 0 0-3.47-8.412z"/></svg><span>Escribir por WhatsApp</span></a>');
+  waBtn.href = 'https://wa.me/527771639759?text=' + encodeURIComponent(waMsg);
+  wrap.appendChild(waBtn);
+
+  var shareUrl = buildShareUrl(p);
+  var shareRow = el('<div class="share-row"><span class="share-text"></span><button type="button" class="copy-btn"><span>copiar enlace</span></button></div>');
+  shareRow.querySelector('.share-text').textContent = shareUrl;
+  var copyBtn = shareRow.querySelector('.copy-btn');
+  copyBtn.addEventListener('click', function(){
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(shareUrl);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = shareUrl; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    copyBtn.querySelector('span').textContent = 'copiado';
+    setTimeout(function(){ copyBtn.querySelector('span').textContent = 'copiar enlace'; }, 1800);
+  });
+  wrap.appendChild(shareRow);
+
+  if(allowRestart){
+    var restart = el('<button type="button" class="restart-btn">repetir el test</button>');
+    restart.addEventListener('click', function(){
+      window.history.replaceState({}, '', window.location.pathname);
+      state.idx=0; state.answers=new Array(QUESTIONS.length).fill(null); state.done=false; render(); window.scrollTo(0,0);
+    });
+    wrap.appendChild(restart);
+  } else {
+    var restart2 = el('<button type="button" class="restart-btn">hacer el test</button>');
+    restart2.addEventListener('click', function(){
+      window.history.replaceState({}, '', window.location.pathname);
+      state.idx=0; state.answers=new Array(QUESTIONS.length).fill(null); state.done=false; render(); window.scrollTo(0,0);
+    });
+    wrap.appendChild(restart2);
+  }
+
+  wrap.appendChild(el('<a class="site-link" href="https://drmiguelavila.com">drmiguelavila.com</a>'));
+
+  return wrap;
+}
+
+// Init: if a shared result is in the URL, show it directly without the quiz
+var shared = readSharedResult();
+if(shared){
+  state.done = true;
+  var app = document.getElementById('app');
+  var key = quadrantKey(shared.sistema, shared.autoria);
+  app.appendChild(buildResultDOM(shared, PROFILES[key], false));
+} else {
+  render();
+}
+
+})();
+</script>
+</body>
+</html>
