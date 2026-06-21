@@ -122,6 +122,15 @@
     font-size: 19px; font-weight: 400; margin: 0 0 16px; color: #f2f0f5;
   }
   .close-body { font-size: 14px; line-height: 1.75; color: #bdb8c6; margin: 0 0 28px; }
+  .close-subtitle {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+    color: #f2f0f5; margin: 0 0 14px;
+  }
+  .close-item { margin: 0 0 16px; }
+  .close-item-label {
+    font-size: 14px; font-weight: 600; color: #d8b8f0; margin: 0 0 4px;
+  }
+  .close-item-body { font-size: 14px; line-height: 1.7; color: #bdb8c6; margin: 0; }
 
   .cta-primary {
     display: block; width: 100%; text-align: center; padding: 14px;
@@ -211,7 +220,13 @@ var QUESTIONS = [
   { axis: 'sistema', text: 'Cuando un proceso cambia desde la central, lo adopto sin necesidad de cuestionarlo primero.' },
   { axis: 'autoria', text: 'Me identifico como alguien inquieto, que necesita variedad y novedad para mantenerse motivado.' },
   { axis: 'sistema', text: 'Prefiero que me digan exactamente qué hacer a tener que decidir el cómo desde cero.' },
-  { axis: 'autoria', text: 'Si veo una oportunidad de mejora, actúo primero y pido permiso después.' }
+  { axis: 'autoria', text: 'Si veo una oportunidad de mejora, actúo primero y pido permiso después.' },
+  { axis: 'sistema', text: 'Cuando enfrento una situación que el manual no contempla, prefiero esperar instrucciones antes que improvisar una solución.' },
+  { axis: 'autoria', text: 'Me cuesta que el mérito de un buen resultado se le atribuya a la marca o al sistema, y no a mí.' },
+  { axis: 'sistema', text: 'Si un proceso que me indicaron seguir falla una vez, sigo confiando en él antes de asumir que está mal diseñado.' },
+  { axis: 'autoria', text: 'Visitar otra unidad idéntica a la mía, con la misma decoración y los mismos productos, me genera más incomodidad que tranquilidad.' },
+  { axis: 'sistema', text: 'Me resulta natural delegar el control de una decisión a alguien con más jerarquía, aunque yo tenga otro punto de vista.' },
+  { axis: 'autoria', text: 'Prefiero un trabajo donde nadie note exactamente qué hice yo, a uno donde mi aporte personal sea invisible.', inverse: true }
 ];
 
 var SCALE = [
@@ -287,7 +302,8 @@ function renderQuestion(){
     var btn = el('<button type="button" class="opt-btn"><span class="opt-dot"></span><span class="opt-label"></span></button>');
     btn.querySelector('.opt-label').textContent = s.label;
     btn.addEventListener('click', function(){
-      state.answers[state.idx] = {axis:q.axis, v:s.v};
+      var val = q.inverse ? (6 - s.v) : s.v;
+      state.answers[state.idx] = {axis:q.axis, v:val};
       if(state.idx < QUESTIONS.length-1){ state.idx++; render(); window.scrollTo(0,0); }
       else { state.done = true; render(); window.scrollTo(0,0); }
     });
@@ -401,42 +417,91 @@ function generatePDF(p, prof, btn){
     doc.setTextColor(60, 56, 66);
     var descLines = doc.splitTextToSize(prof.desc, contentW);
     doc.text(descLines, margin, y);
-    y += descLines.length * 15 + 20;
+    y += descLines.length * 15 + 16;
 
-    // Divider
+    // Footer page 1
+    var pageH = doc.internal.pageSize.getHeight();
     doc.setDrawColor(225, 220, 230);
-    doc.line(margin, y, margin + contentW, y);
-    y += 26;
+    doc.line(margin, pageH - 50, margin + contentW, pageH - 50);
+    doc.setFontSize(8.5);
+    doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text('drmiguelavila.com · WhatsApp +52 777 163 9759', margin, pageH - 34);
+    doc.text('Página 1 de 2', margin + contentW, pageH - 34, {align:'right'});
 
-    // Closing block
-    doc.setFont('times', 'normal');
+    // ---- PAGE 2: full "what a franchise is / is not" content ----
+    doc.addPage();
+    y = 64;
+
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(PURPLE[0], PURPLE[1], PURPLE[2]);
     doc.text('ANTES DE DECIDIR, UNA ACLARACIÓN', margin, y);
-    y += 20;
-    doc.setFontSize(14);
-    doc.setTextColor(INK[0], INK[1], INK[2]);
-    doc.text('Qué es una franquicia, desde el lugar del franquiciatario', margin, y);
     y += 22;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10.5);
-    doc.setTextColor(70, 66, 76);
-    var closeText = 'No es una sociedad ni una inversión pasiva: no hay propiedad compartida del negocio ni dividendos que lleguen sin operar. No es un empleo: nadie te paga un sueldo y la responsabilidad del resultado es tuya. Y no es un espacio para reinventar el modelo: es la licencia para ejecutar, con disciplina y consistencia, un sistema que ya fue probado por alguien más. Lo que compra el franquiciatario no es libertad creativa, es una probabilidad de éxito más alta a cambio de seguir reglas que no diseñó.';
-    var closeLines = doc.splitTextToSize(closeText, contentW);
-    doc.text(closeLines, margin, y);
-    y += closeLines.length * 14 + 30;
 
-    // Footer
-    doc.setDrawColor(225, 220, 230);
-    doc.line(margin, y, margin + contentW, y);
+    doc.setFont('times', 'normal');
+    doc.setFontSize(17);
+    doc.setTextColor(INK[0], INK[1], INK[2]);
+    doc.text('Qué es una franquicia, desde el lugar del franquiciatario', margin, y, {maxWidth: contentW});
+    y += 34;
+
+    function addParagraph(text, opts){
+      opts = opts || {};
+      doc.setFont(opts.font || 'helvetica', opts.style || 'normal');
+      doc.setFontSize(opts.size || 10.5);
+      var c = opts.color || [70, 66, 76];
+      doc.setTextColor(c[0], c[1], c[2]);
+      var lines = doc.splitTextToSize(text, contentW);
+      doc.text(lines, margin, y);
+      y += lines.length * (opts.lineHeight || 14) + (opts.spaceAfter !== undefined ? opts.spaceAfter : 16);
+    }
+
+    addParagraph('En México, la franquicia tiene una definición legal precisa. El artículo 142 de la Ley Federal de Protección a la Propiedad Industrial establece que existe franquicia cuando, mediante la licencia de uso de una marca otorgada por escrito, se transmiten conocimientos técnicos o se brinda asistencia técnica para que el franquiciatario produzca o venda bienes, o preste servicios, de manera uniforme y con los métodos operativos, comerciales y administrativos que fija el titular de la marca.');
+
+    addParagraph('Esa palabra, "uniforme", es la que sostiene todo el modelo. El franquiciatario no compra un negocio para reinventarlo: compra el derecho a replicar, con fidelidad, un sistema que ya fue probado por alguien más.', {spaceAfter: 20});
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11.5);
+    doc.setTextColor(INK[0], INK[1], INK[2]);
+    doc.text('Lo que una franquicia no es', margin, y);
     y += 18;
+
+    var items = [
+      {label:'No es una sociedad.', body:'No existe propiedad compartida del negocio entre franquiciante y franquiciatario. El franquiciante no es tu socio, es tu licenciante: cobra regalías por el uso de su marca y su sistema, no participa de tus pérdidas ni reparte utilidades contigo más allá de lo pactado en el contrato.'},
+      {label:'No es una inversión pasiva.', body:'A diferencia de comprar acciones o un instrumento financiero, una franquicia exige operación directa. Nadie cobra rendimientos por observar desde fuera: el franquiciatario administra, contrata, supervisa y responde personalmente por los resultados del día a día.'},
+      {label:'No es una relación laboral.', body:'El franquiciatario no recibe sueldo del franquiciante ni tiene una relación de subordinación laboral con él. Es un comerciante independiente que opera bajo licencia, con sus propias obligaciones fiscales y patronales frente a sus empleados.'},
+      {label:'No es un espacio para reinventar el modelo.', body:'Esta es la confusión más costosa y la menos discutida antes de firmar. Comprar una franquicia no es comprar el derecho a mejorarla según tu criterio personal, por buena que sea la idea. Es comprar el derecho a operarla tal como fue diseñada.'}
+    ];
+    items.forEach(function(it){
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(PURPLE[0], PURPLE[1], PURPLE[2]);
+      doc.text(it.label, margin, y);
+      y += 14;
+      addParagraph(it.body, {spaceAfter: 14});
+    });
+
+    y += 4;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11.5);
+    doc.setTextColor(INK[0], INK[1], INK[2]);
+    doc.text('Por qué seguir reglas es la variable que decide el resultado', margin, y, {maxWidth: contentW});
+    y += 24;
+
+    addParagraph('El manual de operaciones no es una sugerencia, es la condición contractual que sostiene todo el modelo de franquicia. Cada decisión que el franquiciante ya tomó, el proceso de atención, los estándares de imagen, los tiempos de servicio, el control de inventario, existe porque ya fue probada en otras unidades y demostró funcionar. Cuando el franquiciatario se desvía, no está mejorando el sistema: está rompiendo la consistencia que hace que la marca sea confiable para el cliente final, en cualquier unidad de la red.');
+
+    addParagraph('Por eso la disciplina de sistema no es un rasgo accesorio en este negocio, es la habilidad central. Aceptar la supervisión y las auditorías, revisar los indicadores con regularidad, y pagar las regalías en tiempo no son cargas administrativas: son los mecanismos que mantienen viva la licencia y protegen, al mismo tiempo, a todos los demás franquiciatarios que dependen de la misma marca.');
+
+    addParagraph('Lo que compra el franquiciatario, entonces, no es libertad creativa. Es una probabilidad de éxito más alta, a cambio de seguir reglas que no diseñó él.', {spaceAfter: 8});
+
+    // Footer page 2
+    doc.setDrawColor(225, 220, 230);
+    doc.line(margin, pageH - 50, margin + contentW, pageH - 50);
     doc.setFontSize(8.5);
     doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-    doc.text('drmiguelavila.com · WhatsApp +52 777 163 9759', margin, y);
-    y += 12;
     var today = new Date();
     var fecha = today.toLocaleDateString('es-MX', {year:'numeric', month:'long', day:'numeric'});
-    doc.text('Generado el ' + fecha, margin, y);
+    doc.text('Generado el ' + fecha, margin, pageH - 34);
+    doc.text('Página 2 de 2', margin + contentW, pageH - 34, {align:'right'});
 
     doc.save('perfil-franquiciatario-' + prof.name.toLowerCase().replace(/\s+/g,'-') + '.pdf');
   } catch(err){
@@ -521,7 +586,33 @@ function buildResultDOM(p, prof, allowRestart){
 
   wrap.appendChild(el('<p class="eyebrow">Antes de decidir, una aclaración</p>'));
   wrap.appendChild(el('<p class="close-title">Qué es una franquicia, desde el lugar del franquiciatario</p>'));
-  wrap.appendChild(el('<p class="close-body">No es una sociedad ni una inversión pasiva: no hay propiedad compartida del negocio ni dividendos que lleguen sin operar. No es un empleo: nadie te paga un sueldo y la responsabilidad del resultado es tuya. Y no es un espacio para reinventar el modelo: es la licencia para ejecutar, con disciplina y consistencia, un sistema que ya fue probado por alguien más. Lo que compra el franquiciatario no es libertad creativa, es una probabilidad de éxito más alta a cambio de seguir reglas que no diseñó.</p>'));
+
+  wrap.appendChild(el('<p class="close-body">En México, la franquicia tiene una definición legal precisa. El artículo 142 de la Ley Federal de Protección a la Propiedad Industrial establece que existe franquicia cuando, mediante la licencia de uso de una marca otorgada por escrito, se transmiten conocimientos técnicos o se brinda asistencia técnica para que el franquiciatario produzca o venda bienes, o preste servicios, de manera <em>uniforme</em> y con los métodos operativos, comerciales y administrativos que fija el titular de la marca.</p>'));
+
+  wrap.appendChild(el('<p class="close-body">Esa palabra, <em>uniforme</em>, es la que sostiene todo el modelo. No dice "con creatividad", ni "con autonomía". El franquiciatario no compra un negocio para reinventarlo: compra el derecho a replicar, con fidelidad, un sistema que ya fue probado por alguien más.</p>'));
+
+  wrap.appendChild(el('<p class="close-subtitle">Lo que una franquicia no es</p>'));
+
+  var items = [
+    {label:'No es una sociedad.', body:'No existe propiedad compartida del negocio entre franquiciante y franquiciatario. El franquiciante no es tu socio, es tu licenciante: cobra regalías por el uso de su marca y su sistema, no participa de tus pérdidas ni reparte utilidades contigo más allá de lo pactado en el contrato.'},
+    {label:'No es una inversión pasiva.', body:'A diferencia de comprar acciones o un instrumento financiero, una franquicia exige operación directa. Nadie cobra rendimientos por observar desde fuera: el franquiciatario administra, contrata, supervisa y responde personalmente por los resultados del día a día.'},
+    {label:'No es una relación laboral.', body:'El franquiciatario no recibe sueldo del franquiciante ni tiene una relación de subordinación laboral con él. Es un comerciante independiente que opera bajo licencia, con sus propias obligaciones fiscales y patronales frente a sus empleados.'},
+    {label:'No es un espacio para reinventar el modelo.', body:'Esta es la confusión más costosa y la menos discutida antes de firmar. Comprar una franquicia no es comprar el derecho a mejorarla según tu criterio personal, por buena que sea la idea. Es comprar el derecho a operarla tal como fue diseñada.'}
+  ];
+  items.forEach(function(it){
+    var itemEl = el('<div class="close-item"><p class="close-item-label"></p><p class="close-item-body"></p></div>');
+    itemEl.querySelector('.close-item-label').textContent = it.label;
+    itemEl.querySelector('.close-item-body').textContent = it.body;
+    wrap.appendChild(itemEl);
+  });
+
+  wrap.appendChild(el('<p class="close-subtitle" style="margin-top:8px;">Por qué seguir reglas es la variable que decide el resultado</p>'));
+
+  wrap.appendChild(el('<p class="close-body">El manual de operaciones no es una sugerencia, es la condición contractual que sostiene todo el modelo de franquicia. Cada decisión que el franquiciante ya tomó, el proceso de atención, los estándares de imagen, los tiempos de servicio, el control de inventario, existe porque ya fue probada en otras unidades y demostró funcionar. Cuando el franquiciatario se desvía, no está mejorando el sistema: está rompiendo la consistencia que hace que la marca sea confiable para el cliente final, en cualquier unidad de la red.</p>'));
+
+  wrap.appendChild(el('<p class="close-body">Por eso la disciplina de sistema no es un rasgo accesorio en este negocio, es la habilidad central. Aceptar la supervisión y las auditorías, revisar los indicadores con regularidad, y pagar las regalías en tiempo no son cargas administrativas: son los mecanismos que mantienen viva la licencia y protegen, al mismo tiempo, a todos los demás franquiciatarios que dependen de la misma marca.</p>'));
+
+  wrap.appendChild(el('<p class="close-body">Lo que compra el franquiciatario, entonces, no es libertad creativa. Es una probabilidad de éxito más alta, a cambio de seguir reglas que no diseñó él.</p>'));
 
   var ctaPrimary = el('<a class="cta-primary" target="_blank" rel="noopener">Agendar una conversación sobre mi resultado ↗</a>');
   ctaPrimary.href = 'https://www.yafahexpress.com/registro-franquicias';
